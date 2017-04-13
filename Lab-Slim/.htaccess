@@ -1,0 +1,9 @@
+# Liga a reescrita de URL
+RewriteEngine On
+
+# Exclui da reescrita de URL arquivos e diretórios 
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{SCRIPT_FILENAME} !-d
+
+# Encaminha todos os arquivos para o index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
