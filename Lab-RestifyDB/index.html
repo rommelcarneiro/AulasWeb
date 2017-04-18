@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Restify DB</title>
+    <script>
+        const url_WS = 'http://www.smartsoft.com.br/webservice/restifydb/Employees/filmes';
+
+        // Função para executar o Retrieve do CRUD
+        function execRetrieve() {
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function() {
+                if ((req.readyState == 4) && (req.status == 200)) {
+                    var dados = JSON.parse(req.responseText);
+                    var tabelaHTML = '';
+
+                    // Montagem da tabela HTML
+                    tabelaHTML = '<table border="1">';
+                    for (i = 0; i < dados.restify.rows.length; i++) {
+                        tabelaHTML += '<tr>';
+                        tabelaHTML += '<td><img src="' + dados.restify.rows[i].values.imagem_url.value + '"></td>';
+                        tabelaHTML += '<td><h2>' + dados.restify.rows[i].values.titulo.value + '</h2>';
+                        tabelaHTML += dados.restify.rows[i].values.sinopse.value + '<br>';
+                        tabelaHTML += '<p>Categoria: ' + dados.restify.rows[i].values.categoria.value + '<br>';
+                        tabelaHTML += 'Diretor: ' + dados.restify.rows[i].values.diretor.value + '<br>';
+                        tabelaHTML += 'Ano: ' + dados.restify.rows[i].values.ano.value + '<br>';
+                        tabelaHTML += 'Duração: ' + dados.restify.rows[i].values.duracao.value + ' min</p>';
+                        tabelaHTML += '<p><a href="javascript:execDelete(' + dados.restify.rows[i].values.id.value + ')">Excluir</a> | <a href="javascript:">Modificar</a></p>';
+                        tabelaHTML += '</td></tr>';
+                    }
+                    tabelaHTML += '</table>';
+
+                    // Inserção do código HTML na DIV
+                    document.getElementById('div_listagem').innerHTML = tabelaHTML;
+                }
+
+            };
+            req.open('GET', url_WS, true);
+            req.send();
+        }
+
+        // Função para executar o Delete do CRUD
+        function execDelete(id) {
+            // Confirma exclusão
+            if (confirm('Deseja realmente excluir o registro ' + id + '?')) {
+                var req = new XMLHttpRequest();
+
+                req.onreadystatechange = function() {
+                    if ((req.readyState == 4) && (req.status == 200)) {
+                        alert('Registro exlcuído.');
+
+                        // Recarrega listagem
+                        execRetrieve();
+                    }
+
+                };
+                req.open('DELETE', url_WS + '/' + id, true);
+                req.send();
+            }
+        }
+
+        // Função para executar o Create do CRUD
+        function execCreate (titulo, categoria, diretor, ano, duracao, sinopse, imagem_url) {
+            var req = new XMLHttpRequest();
+
+            req.onreadystatechange = function() {
+                if ((req.readyState == 4) && (req.status == 200)) {
+                    alert('Registro incluído com sucesso.');
+
+                    // Recarrega listagem
+                    execRetrieve();
+                    document.getElementById('formFilme').reset();
+                }
+
+            };
+            var dadosJSON = '_data={"titulo": "'+ titulo.value + '", ' + 
+                            '"diretor": "' + diretor.value + '", ' +
+                            '"ano": "' + ano.value + '", ' +
+                            '"duracao": "' + duracao.value + '", ' + 
+                            '"sinopse": "' + sinopse.value + '", ' + 
+                            '"imagem_url": "' + imagem_url.value + '"}';
+            
+            req.open('POST', url_WS, true);
+            req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            req.send(dadosJSON);            
+        }
+    </script>
+</head>
+
+<body onload="execRetrieve();">
+    <div id="div_listagem">
+
+    </div>
+    <div class="div_form">
+        <form  id="formFilme" action="javascript:execCreate(this.titulo, this.categoria, this.diretor, this.ano, this.duracao, this.sinopse, this.imagem_url)">
+            <p><label for="titulo">Título</label><input type="text" id="titulo"></p>
+            <p><label for="categoria">Categoria</label><input type="text" id="categoria"></p>
+            <p><label for="diretor">Diretor</label><input type="text" id="diretor"></p>
+            <p><label for="ano">Ano</label><input type="text" id="ano"></p>
+            <p><label for="duracao">Duração</label><input type="text" id="duracao"></p>
+            <p><label for="sinopse">Sinopse</label><textarea name="sinopse" id="sinopse" cols="30" rows="10"></textarea></p>
+            <p><label for="imagem_url">URL da Imagem</label><input type="text" id="imagem_url"></p>
+            <input type="submit" value="Ok">
+        </form>
+    </div>
+</body>
+
+</html>
