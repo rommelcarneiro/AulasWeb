@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Ôªø<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,7 +7,7 @@
     <script>
         const url_WS = 'http://www.smartsoft.com.br/webservice/restifydb/Employees/filmes';
 
-        // FunÁ„o para executar o Retrieve do CRUD
+        // Fun√ß√£o para executar o Retrieve do CRUD
         function execRetrieve() {
             var req = new XMLHttpRequest();
 
@@ -26,13 +26,13 @@
                         tabelaHTML += '<p>Categoria: ' + dados.restify.rows[i].values.categoria.value + '<br>';
                         tabelaHTML += 'Diretor: ' + dados.restify.rows[i].values.diretor.value + '<br>';
                         tabelaHTML += 'Ano: ' + dados.restify.rows[i].values.ano.value + '<br>';
-                        tabelaHTML += 'DuraÁ„o: ' + dados.restify.rows[i].values.duracao.value + ' min</p>';
+                        tabelaHTML += 'Dura√ß√£o: ' + dados.restify.rows[i].values.duracao.value + ' min</p>';
                         tabelaHTML += '<p><a href="javascript:execDelete(' + dados.restify.rows[i].values.id.value + ')">Excluir</a> | <a href="javascript:">Modificar</a></p>';
                         tabelaHTML += '</td></tr>';
                     }
                     tabelaHTML += '</table>';
 
-                    // InserÁ„o do cÛdigo HTML na DIV
+                    // Inser√ß√£o do c√≥digo HTML na DIV
                     document.getElementById('div_listagem').innerHTML = tabelaHTML;
                 }
 
@@ -41,15 +41,15 @@
             req.send();
         }
 
-        // FunÁ„o para executar o Delete do CRUD
+        // Fun√ß√£o para executar o Delete do CRUD
         function execDelete(id) {
-            // Confirma exclus„o
+            // Confirma exclus√£o
             if (confirm('Deseja realmente excluir o registro ' + id + '?')) {
                 var req = new XMLHttpRequest();
 
                 req.onreadystatechange = function() {
                     if ((req.readyState == 4) && (req.status == 200)) {
-                        alert('Registro exlcuÌdo.');
+                        alert('Registro exlcu√≠do.');
 
                         // Recarrega listagem
                         execRetrieve();
@@ -61,13 +61,13 @@
             }
         }
 
-        // FunÁ„o para executar o Create do CRUD
+        // Fun√ß√£o para executar o Create do CRUD
         function execCreate (titulo, categoria, diretor, ano, duracao, sinopse, imagem_url) {
             var req = new XMLHttpRequest();
 
             req.onreadystatechange = function() {
                 if ((req.readyState == 4) && (req.status == 200)) {
-                    alert('Registro incluÌdo com sucesso.');
+                    alert('Registro inclu√≠do com sucesso.');
 
                     // Recarrega listagem
                     execRetrieve();
@@ -95,11 +95,11 @@
     </div>
     <div class="div_form">
         <form  id="formFilme" action="javascript:execCreate(this.titulo, this.categoria, this.diretor, this.ano, this.duracao, this.sinopse, this.imagem_url)">
-            <p><label for="titulo">TÌtulo</label><input type="text" id="titulo"></p>
+            <p><label for="titulo">T√≠tulo</label><input type="text" id="titulo"></p>
             <p><label for="categoria">Categoria</label><input type="text" id="categoria"></p>
             <p><label for="diretor">Diretor</label><input type="text" id="diretor"></p>
             <p><label for="ano">Ano</label><input type="text" id="ano"></p>
-            <p><label for="duracao">DuraÁ„o</label><input type="text" id="duracao"></p>
+            <p><label for="duracao">Dura√ß√£o</label><input type="text" id="duracao"></p>
             <p><label for="sinopse">Sinopse</label><textarea name="sinopse" id="sinopse" cols="30" rows="10"></textarea></p>
             <p><label for="imagem_url">URL da Imagem</label><input type="text" id="imagem_url"></p>
             <input type="submit" value="Ok">
