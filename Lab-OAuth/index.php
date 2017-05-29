@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "vendor/autoload.php";
+require "config.php";
 
 use GuzzleHttp\Client;
 $user_name = '';
@@ -12,8 +13,8 @@ if (isset($_SESSION['token'])) {
         $api = $_SESSION['api'];
         
         if ($api == 'google') {
-            $url = 'https://www.googleapis.com/oauth2/v1/userinfo?access_token=' . $token;
-
+            // Dspara requisição para o Google para obter dados do usuário
+            $url =  $GOOGLE_API_RESOURCE_URL . '?access_token=' . $token;
             $client  = new Client ();
             $response = $client->request ("GET", $url, [
                     'verify' => false, 
@@ -31,8 +32,8 @@ if (isset($_SESSION['token'])) {
             }            
         }
         elseif ($api == 'facebook') {
-            $url = 'https://graph.facebook.com/v2.8/me?fields=id,name,email,location&access_token=' . $token;
-
+            // Dspara requisição para o Facebook para obter dados do usuário
+            $url = $FACEBOOK_API_RESOURCE_URL .'?fields=id,name,email,location&access_token=' . $token;
             $client  = new Client ();
             $response = $client->request ("GET", $url, [
                     'verify' => false, 
@@ -67,8 +68,7 @@ if (isset($_SESSION['token'])) {
 <body>
     <?php if (!isset($_SESSION['token'])) { ?>
       Entrar com o Login do: <a href="OAuthRequest.php?api=google">Google</a> | 
-                             <a href="OAuthRequest.php?api=facebook">Facebook</a> | 
-                             <a href="OAuthRequest.php?api=twitter">Twitter</a>
+                             <a href="OAuthRequest.php?api=facebook">Facebook</a>
     <?php } else { ?> 
       Olá <?= $user_name ?>! <br/>
       <a href="logout.php">Logout</a>

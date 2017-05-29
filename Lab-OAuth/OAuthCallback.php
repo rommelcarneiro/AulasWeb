@@ -1,17 +1,18 @@
 <?php
 session_start();
 require "vendor/autoload.php";
-
-$CLIENT_ID = "6199248294-srq3i9ujbdr0ks0ckft5qsngrvmo4t78.apps.googleusercontent.com";
-$CLIENT_SECRET_KEY = "geCtqwwWaQDhutwYv4uHgE2G";
+require "config.php";
 
 use GuzzleHttp\Client;
 
 if (isset($_REQUEST['api'])) {
+    // Obtem a identificação de qual API está
+    // sendo utilizada (Google ou Facebook)
     $api = $_REQUEST['api'];
 
     if(isset($_GET['code'])) {
-        // try to get an access token
+        // Obtem o código de autorizacão devolvido
+        // pelo Servidor de Autorização
         $code = $_GET['code'];
     }
     else {
@@ -20,49 +21,50 @@ if (isset($_REQUEST['api'])) {
         die;
     }        
     
+    // De acordo com a API escolhida faz requisição
+    // ao Servidor de Autorização
     switch($api) {
         case 'google': 
-            $GOOGLE_API_URL = "https://accounts.google.com/o/oauth2/token";
-            $GOOGLE_CLIENT_ID = "6199248294-srq3i9ujbdr0ks0ckft5qsngrvmo4t78.apps.googleusercontent.com";
-            $GOOGLE_CLIENT_SECRET_KEY = "geCtqwwWaQDhutwYv4uHgE2G";
-            $GOOGLE_SCOPE = "https://www.googleapis.com/auth/plus.me";
-
+            // Dispara requisição para o Servidor de Autorização
+            // do Google solicitando a token de acesso
             $client  = new Client ();
-            $response = $client->request("POST", $GOOGLE_API_URL, [
+            $response = $client->request("POST", $GOOGLE_API_TOKEN_URL, [
                 'verify' => false,
                 'http_errors' => false,
                 'form_params' => [
                     "code" => $code,
                     "client_id" => $GOOGLE_CLIENT_ID,
                     "client_secret" => $GOOGLE_CLIENT_SECRET_KEY,
-                    "redirect_uri" => "http://localhost/AulasWeb/Lab-OAuth/OAuthCallback.php?api=google",
+                    "redirect_uri" => $CALLBACK_URL . "?api=google",
                     "grant_type" => "authorization_code"            
                 ]
             ]);            
             break;
         case 'facebook' :
-            $FACEBOOK_URL = 'https://graph.facebook.com/v2.8/oauth/access_token';
-            $FACEBOOK_CLIENT_ID = '244927775973840';
-            $FACEBOOK_SCOPE = 'public_profile, email';
-            $FACEBOOK_CLIENT_SECRET_KEY = '4a2c70ae1bd579239a8f72b16397fd30';
-            
+            // Dispara requisição para o Servidor de Autorização 
+            // do Facebook solicitando a token de acesso
             $client  = new Client ();
-            $response = $client->request("POST", $FACEBOOK_URL, [
+            $response = $client->request("POST", $FACEBOOK_API_TOKEN_URL, [
                 'verify' => false,
                 'http_errors' => false,
                 'form_params' => [
                     "code" => $code,
                     "client_id" => $FACEBOOK_CLIENT_ID,
                     "client_secret" => $FACEBOOK_CLIENT_SECRET_KEY,
-                    "redirect_uri" => "http://localhost/AulasWeb/Lab-OAuth/OAuthCallback.php" . "?api=facebook",
+                    "redirect_uri" => $CALLBACK_URL . "?api=facebook",
                     "grant_type" => "authorization_code"            
                 ]
             ]);  
             break;
     }
 
+    // obtem a token de acesso a partir do retorno do 
+    // Servidor de Autorização e salva na sessão do usuário
     $data = json_decode($response->getBody());
     $_SESSION['token'] = $data->access_token;
+    
+    // Redireciona para a página inicial que irá obter 
+    // os dados do usuário a partir do Servidor de Recursos
     header('Location: /AulasWeb/Lab-OAuth/');
 
 }
