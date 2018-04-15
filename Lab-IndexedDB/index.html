@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lab IndexedDB</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script>        
+        function init() {
+            initDBEngine();
+            openDB();
+
+            // Adiciona Listerners
+            $("#btnInsert").click(function () {
+                let campoNome = $("#inputNome").val();
+                let campoTelefone = $("#inputTelefone").val();
+                let campoEmail = $("#inputEmail").val();
+                let contato = { nome: campoNome, telefone: campoTelefone, email: campoEmail };
+
+                insertContato(contato);
+                $("#form_contato")[0].reset();
+                setTimeout(exibeContatos, 200);
+            });
+
+            // Intercepta o click do botão Alterar
+            $("#btnUpdate").click(function () {
+                let campoId = $("#inputId").val();
+                let campoNome = $("#inputNome").val();
+                let campoTelefone = $("#inputTelefone").val();
+                let campoEmail = $("#inputEmail").val();
+                let contato = { nome: campoNome, telefone: campoTelefone, email: campoEmail };
+
+                updateContato(campoId, contato);
+                $("#form_contato")[0].reset();
+                setTimeout(exibeContatos, 200);
+            });
+
+            // Intercepta o click do botão Excluir
+            $("#btnDelete").click(function () {
+                let campoId = $("#inputId").val();
+                deleteContato(campoId);
+                setTimeout(exibeContatos, 200);
+            });
+
+            // Intercepta o click do botão Listar Contatos
+            $("#btnList").click(function () {
+                exibeContatos();
+            });
+
+            // Intercepta o click do botão Listar Contatos
+            $("#btnClear").click(function () {
+                $("#form_contato")[0].reset();
+            });
+
+            // Oculta a mensagem de aviso após alguns segundos
+            $('#msg').bind("DOMSubtreeModified", function () {
+                window.setTimeout(function () {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            });
+
+            $("#grid-contatos").on("click", "tr", function (e) {
+                let linhaContato = this;
+                $("#inputId").val(linhaContato.childNodes[0].firstChild.nodeValue);
+                $("#inputNome").val(linhaContato.childNodes[1].firstChild.nodeValue);
+                $("#inputTelefone").val(linhaContato.childNodes[2].firstChild.nodeValue);
+                $("#inputEmail").val(linhaContato.childNodes[3].firstChild.nodeValue);
+            });
+
+            setTimeout(exibeContatos, 200);
+        }
+
+        function exibeContatos() {
+            $("#table-contatos").html("");
+            getAllContatos(function (contato) {
+                $("#table-contatos").append("<tr><td scope=\"row\">" + contato.id + "</th><td>" + contato.nome
+                    + "</td><td>" + contato.telefone + "</td><td>" + contato.email + "</td></tr>");
+            });
+        }
+
+    </script>
+</head>
+
+<body onload="init()">
+    <h1>Lab IndexedDB - CRUD de Contatos</h1>
+
+    <div class="container">
+        <div class="row">
+            <div id="msg" class="col-sm-8 offset-sm-2 ">
+                <!--<div class="alert alert-warning">Contato não encontrado.</div>-->
+            </div>
+        </div>
+
+        <form id="form_contato">
+            <div class="form-group row">
+                <div class="col-sm-4">
+                    <label for="inputId">Id</label>
+                    <input type="text" class="form-control" id="inputId" placeholder="ID">
+                    <small>Informe apenas para atualiza/excluir</small>
+                </div>
+                <div class="col-sm-8">
+                    <label for="inputNome">Nome</label>
+                    <input type="text" class="form-control" id="inputNome" placeholder="Informe o nome do contato">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-5">
+                    <label for="inputTelefone">Telefone</label>
+                    <input type="text" class="form-control" id="inputTelefone" placeholder="Telefone">
+                </div>
+                <div class="col-sm-7">
+                    <label for="inputEmail">E-mail</label>
+                    <input type="email" class="form-control" id="inputEmail" placeholder="Informe o e-mail">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="button" class="btn btn-success" id="btnInsert" value="Inserir">
+                    <input type="button" class="btn btn-warning" id="btnUpdate" value="Alterar">
+                    <input type="button" class="btn btn-danger" id="btnDelete" value="Excluir">
+                    <input type="button" class="btn btn-secondary" id="btnList" value="Listar Contatos">
+                    <input type="button" class="btn btn-secondary" id="btnClear" value="Limpar Form">
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="grid-contatos" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Telefone</th>
+                            <th scope="col">E-mail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-contatos">
+                        <tr>
+                            <td scope="row">1</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="database.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+</body>
+
+</html>
