@@ -15,33 +15,46 @@
 
             // Adiciona Listerners
             $("#btnInsert").click(function () {
+                if (!$('#form-contato')[0].checkValidity()) {
+                    displayMessage("Preencha o formulário corretamente.");
+                    return;
+                }
                 let campoNome = $("#inputNome").val();
                 let campoTelefone = $("#inputTelefone").val();
                 let campoEmail = $("#inputEmail").val();
                 let contato = { nome: campoNome, telefone: campoTelefone, email: campoEmail };
 
                 insertContato(contato);
-                $("#form_contato")[0].reset();
+                $("#form-contato")[0].reset();
                 setTimeout(exibeContatos, 200);
             });
 
             // Intercepta o click do botão Alterar
             $("#btnUpdate").click(function () {
                 let campoId = $("#inputId").val();
+                if (campoId == "") {
+                    displayMessage("Informe o ID do contato a ser alterado e a alteração desejada.");
+                    return;
+                }
                 let campoNome = $("#inputNome").val();
                 let campoTelefone = $("#inputTelefone").val();
                 let campoEmail = $("#inputEmail").val();
                 let contato = { nome: campoNome, telefone: campoTelefone, email: campoEmail };
 
                 updateContato(campoId, contato);
-                $("#form_contato")[0].reset();
+                $("#form-contato")[0].reset();
                 setTimeout(exibeContatos, 200);
             });
 
             // Intercepta o click do botão Excluir
             $("#btnDelete").click(function () {
                 let campoId = $("#inputId").val();
+                if (campoId == "") {
+                    displayMessage("Informe o ID do contato a ser excluído.");
+                    return;
+                }
                 deleteContato(campoId);
+                $("#form-contato")[0].reset();
                 setTimeout(exibeContatos, 200);
             });
 
@@ -52,7 +65,7 @@
 
             // Intercepta o click do botão Listar Contatos
             $("#btnClear").click(function () {
-                $("#form_contato")[0].reset();
+                $("#form-contato")[0].reset();
             });
 
             // Oculta a mensagem de aviso após alguns segundos
@@ -71,7 +84,6 @@
                 $("#inputTelefone").val(linhaContato.childNodes[2].firstChild.nodeValue);
                 $("#inputEmail").val(linhaContato.childNodes[3].firstChild.nodeValue);
             });
-
             setTimeout(exibeContatos, 200);
         }
 
@@ -91,31 +103,36 @@
 
     <div class="container">
         <div class="row">
-            <div id="msg" class="col-sm-8 offset-sm-2 ">
+            <div id="msg" class="col-sm-10 offset-sm-1 ">
                 <!--<div class="alert alert-warning">Contato não encontrado.</div>-->
             </div>
         </div>
 
-        <form id="form_contato">
+        <form id="form-contato">
             <div class="form-group row">
                 <div class="col-sm-4">
                     <label for="inputId">Id</label>
                     <input type="text" class="form-control" id="inputId" placeholder="ID">
-                    <small>Informe apenas para atualiza/excluir</small>
+                    <small>Informe apenas para alterar/excluir</small>
                 </div>
                 <div class="col-sm-8">
-                    <label for="inputNome">Nome</label>
-                    <input type="text" class="form-control" id="inputNome" placeholder="Informe o nome do contato">
+                    <label for="inputNome">Nome (*)</label>
+                    <input type="text" class="form-control" id="inputNome" required placeholder="Informe o nome do contato">
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-5">
-                    <label for="inputTelefone">Telefone</label>
-                    <input type="text" class="form-control" id="inputTelefone" placeholder="Telefone">
+                    <label for="inputTelefone">Telefone (*)</label>
+                    <input type="text" class="form-control" id="inputTelefone" required placeholder="Telefone">
                 </div>
                 <div class="col-sm-7">
-                    <label for="inputEmail">E-mail</label>
-                    <input type="email" class="form-control" id="inputEmail" placeholder="Informe o e-mail">
+                    <label for="inputEmail">E-mail (*)</label>
+                    <input type="email" class="form-control" id="inputEmail" required placeholder="Informe o e-mail">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-4">
+                    <small>(*) Campos obrigatórios</small>
                 </div>
             </div>
             <div class="form-group row">

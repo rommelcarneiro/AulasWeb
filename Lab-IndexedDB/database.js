@@ -7,12 +7,11 @@
 //  Autor: Rommel Vieira Carneiro
 ///------------------------------------------
 
-// letiáveis que armazenam a conexão ao banco de dados e o objeto de requisições
+// variáveis que armazenam a conexão ao banco de dados
 var db_app;
-
+// Constantes para nomes do banco de dados e ObjectStores
 const CONST_DB_APP = "pucminas.br.db_app";
 const CONST_OS_CONTATO = "os_contato";
-
 
 function initDBEngine() {
     // Na linha abaixo, você deve incluir os prefixos do navegador que você vai testar.
@@ -28,29 +27,6 @@ function initDBEngine() {
     }
 }
 
-function openDB() {
-    request = indexedDB.open(CONST_DB_APP);
-
-    request.onerror = function (event) {
-        alert("Você não habilitou minha web app para usar IndexedDB?!");
-    };
-    request.onsuccess = function (event) {
-        db_app = request.result;
-    };
-
-    request.onupgradeneeded = function (event) {
-        let store = event.currentTarget.result.createObjectStore(
-            CONST_OS_CONTATO, { keyPath: 'id', autoIncrement: true });
-
-        store.createIndex('nome', 'nome', { unique: true });
-        store.createIndex('telefone', 'telefone', { unique: false });
-        store.createIndex('email', 'email', { unique: true });
-
-        // Carrega dados ficticios
-        loadDataContatos(store);
-    };
-}
-
 function getObjectStore(store_name, mode) {
     let tx = db_app.transaction(store_name, mode);
     return tx.objectStore(store_name);
@@ -60,20 +36,39 @@ function displayMessage(msg) {
     $('#msg').html('<div class="alert alert-warning">' + msg + '</div>');
 }
 
+function openDB() {
+    request = indexedDB.open(CONST_DB_APP);
+
+    request.onerror = function (event) {
+        alert("Você não habilitou minha web app para usar IndexedDB?!");
+    };
+    request.onsuccess = function (event) {
+        db_app = request.result;
+    };
+    request.onupgradeneeded = function (event) {
+        let store = event.currentTarget.result.createObjectStore(
+            CONST_OS_CONTATO, { keyPath: 'id', autoIncrement: true });
+
+        store.createIndex('nome', 'nome', { unique: true });
+        store.createIndex('telefone', 'telefone', { unique: false });
+        store.createIndex('email', 'email', { unique: true });
+
+        // Carrega dados ficticios
+        loadDadosContatos(store);
+    };
+}
+
 function insertContato(contato) {
     let store = getObjectStore(CONST_OS_CONTATO, 'readwrite');
     let req;
-
     req = store.add(contato);
 
     req.onsuccess = function (evt) {
-        console.log("Contato inserido com sucesso.");
         displayMessage("Contato inserido com sucesso");
     };
 
     req.onerror = function () {
-        console.error("Erro ao adicionar contato", this.error);
-        displayMessage(this.error);
+        displayMessage("Erro ao adicionar contato", this.error);
     };
 }
 
@@ -95,12 +90,19 @@ function getAllContatos(callback) {
     req.onerror = function (event) {
         displayMessage("Erro ao obter contatos:", event.target.errorCode);
     };
-
 }
 
-function getContato(id, handlerFunction) {
-
-    return contato;
+function getContato(id, callback) {
+    let store = getObjectStore(CONST_OS_CONTATO, 'readwrite');
+    if (typeof id == "string") { id = parseInt(id); }
+    let req = store.get(id);
+    req.onsuccess = function (event) {
+        let record = req.result;
+        callback (record);
+    };
+    req.onerror = function (event) {
+        displayMessage("Contato não encontrado:", event.target.errorCode);
+    };
 }
 
 function deleteContato(id) {
@@ -138,7 +140,7 @@ function updateContato(id, contato) {
     };
 }
 
-function loadDataContatos(store) {
+function loadDadosContatos(store) {
     // Isso é o que os dados de nossos clientes será.
     const dadosContatos = [
         { nome: "Rafael Souza", telefone: "31-99856-3358", email: "rafaels11@hotmail.com" },

@@ -18,3 +18,6 @@ label {
  #msg {
      height: 60px;
  }
+ #grid-contatos tbody {
+     cursor: pointer;
+ }
